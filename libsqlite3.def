@@ -1,0 +1,107 @@
+(*
+ *
+ *)
+DEFINITION MODULE FOR "C" libsqlite3;
+
+FROM SYSTEM IMPORT ADDRESS;
+
+EXPORT UNQUALIFIED   sqlite3, sqlite3_stmt, sqlite3_open, sqlite3_close,
+                     sqlite3_prepare_v2, sqlite3_reset, sqlite3_finalize,
+                     sqlite3_step, sqlite3_column_count, sqlite3_column_blob,
+                     sqlite3_column_double, sqlite3_column_int,
+                     sqlite3_column_text, sqlite3_column_bytes,
+                     sqlite3_column_type, sqlite3_bind_double,
+                     sqlite3_bind_int, sqlite3_bind_null, sqlite3_bind_text,
+                     sqlite3_exec,
+                     SQLITE_OK, SQLITE_ERROR, SQLITE_INTERNAL, SQLITE_PERM,
+                     SQLITE_ABORT, SQLITE_BUSY, SQLITE_LOCKED, SQLITE_NOMEM,
+                     SQLITE_READONLY, SQLITE_INTERRUPT, SQLITE_IOERR,
+                     SQLITE_CORRUPT, SQLITE_NOTFOUND, SQLITE_FULL,
+                     SQLITE_CANTOPEN, SQLITE_PROTOCOL, SQLITE_EMPTY,
+                     SQLITE_SCHEMA, SQLITE_TOOBIG, SQLITE_CONSTRAINT,
+                     SQLITE_MISMATCH, SQLITE_MISUSE, SQLITE_NOLFS, SQLITE_AUTH,
+                     SQLITE_FORMAT, SQLITE_RANGE, SQLITE_NOTADB, SQLITE_NOTICE,
+                     SQLITE_WARNING, SQLITE_ROW, SQLITE_DONE;
+
+CONST
+   SQLITE_OK         =  0 ;  (* Successful result *)
+   SQLITE_ERROR      =  1 ;  (* Generic error *)
+   SQLITE_INTERNAL   =  2 ;  (* Internal logic error in SQLite *)
+   SQLITE_PERM       =  3 ;  (* Access permission denied *)
+   SQLITE_ABORT      =  4 ;  (* Callback routine requested an abort *)
+   SQLITE_BUSY       =  5 ;  (* The database file is locked *)
+   SQLITE_LOCKED     =  6 ;  (* A table in the database is locked *)
+   SQLITE_NOMEM      =  7 ;  (* A malloc() failed *)
+   SQLITE_READONLY   =  8 ;  (* Attempt to write a readonly database *)
+   SQLITE_INTERRUPT  =  9 ;  (* Operation terminated by sqlite3_interrupt()*)
+   SQLITE_IOERR      = 10 ;  (* Some kind of disk I/O error occurred *)
+   SQLITE_CORRUPT    = 11 ;  (* The database disk image is malformed *)
+   SQLITE_NOTFOUND   = 12 ;  (* Unknown opcode in sqlite3_file_control() *)
+   SQLITE_FULL       = 13 ;  (* Insertion failed because database is full *)
+   SQLITE_CANTOPEN   = 14 ;  (* Unable to open the database file *)
+   SQLITE_PROTOCOL   = 15 ;  (* Database lock protocol error *)
+   SQLITE_EMPTY      = 16 ;  (* Internal use only *)
+   SQLITE_SCHEMA     = 17 ;  (* The database schema changed *)
+   SQLITE_TOOBIG     = 18 ;  (* String or BLOB exceeds size limit *)
+   SQLITE_CONSTRAINT = 19 ;  (* Abort due to constraint violation *)
+   SQLITE_MISMATCH   = 20 ;  (* Data type mismatch *)
+   SQLITE_MISUSE     = 21 ;  (* Library used incorrectly *)
+   SQLITE_NOLFS      = 22 ;  (* Uses OS features not supported on host *)
+   SQLITE_AUTH       = 23 ;  (* Authorization denied *)
+   SQLITE_FORMAT     = 24 ;  (* Not used *)
+   SQLITE_RANGE      = 25 ;  (* 2nd parameter to sqlite3_bind out of range *)
+   SQLITE_NOTADB     = 26 ;  (* File opened that is not a database file *)
+   SQLITE_NOTICE     = 27 ;  (* Notifications from sqlite3_log() *)
+   SQLITE_WARNING    = 28 ;  (* Warnings from sqlite3_log() *)
+   SQLITE_ROW        = 100;  (* sqlite3_step() has another row ready *)
+   SQLITE_DONE       = 101;  (* sqlite3_step() has finished executing *)
+
+TYPE
+   sqlite3;
+   sqlite3_stmt;
+
+
+PROCEDURE sqlite3_open           (filename : ARRAY OF CHAR;
+                                  VAR db   : sqlite3)               : [INTEGER];
+PROCEDURE sqlite3_close          (VAR db : sqlite3)                 : [INTEGER];
+PROCEDURE sqlite3_prepare_v2     (    db    : sqlite3;
+                                      sql   : ARRAY OF CHAR;
+                                      nbyte : INTEGER;
+                                  VAR stmt  : sqlite3_stmt;
+                                  VAR tail  : ADDRESS)              : [INTEGER];
+PROCEDURE sqlite3_reset          (stmt : sqlite3_stmt)              : [INTEGER];
+PROCEDURE sqlite3_finalize       (stmt : sqlite3_stmt)              : [INTEGER];
+PROCEDURE sqlite3_step           (stmt : sqlite3_stmt)              : [INTEGER];
+PROCEDURE sqlite3_column_count   (stmt : sqlite3_stmt)                : INTEGER;
+PROCEDURE sqlite3_column_blob    (stmt : sqlite3_stmt;
+                                  icol : INTEGER)                     : ADDRESS;
+PROCEDURE sqlite3_column_double  (stmt : sqlite3_stmt;
+                                  icol : INTEGER)                     : ADDRESS;
+PROCEDURE sqlite3_column_int     (stmt : sqlite3_stmt;
+                                  icol : INTEGER)                     : ADDRESS;
+PROCEDURE sqlite3_column_text    (stmt : sqlite3_stmt;
+                                  icol : INTEGER)                     : ADDRESS;
+PROCEDURE sqlite3_column_bytes   (stmt : sqlite3_stmt;
+                                  icol : INTEGER)                     : INTEGER;
+PROCEDURE sqlite3_column_type    (stmt : sqlite3_stmt;
+                                  icol : INTEGER)                     : INTEGER;
+PROCEDURE sqlite3_bind_double    (stmt  : sqlite3_stmt;
+                                  i     : INTEGER;
+                                  value : REAL)                     : [INTEGER];
+PROCEDURE sqlite3_bind_int       (stmt  : sqlite3_stmt;
+                                  i,
+                                  value : INTEGER)                  : [INTEGER];
+PROCEDURE sqlite3_bind_null      (stmt : sqlite3_stmt;
+                                  i    : INTEGER)                   : [INTEGER];
+PROCEDURE sqlite3_bind_text      (stmt  : sqlite3_stmt;
+                                  i     : INTEGER;
+                                  value : ARRAY OF CHAR;
+                                  size  : INTEGER;
+                                  dtor  : ADDRESS)                  : [INTEGER];
+PROCEDURE sqlite3_exec           (db      : sqlite3;
+                                  sql     : ARRAY OF CHAR;
+                                  callback,
+                                  cbarg   ,
+                                  errmsg  : ADDRESS)                : [INTEGER];
+
+END libsqlite3.
