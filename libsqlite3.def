@@ -1,7 +1,13 @@
-(*
- *
- *)
 DEFINITION MODULE FOR "C" libsqlite3;
+
+(*
+    Title      : libsqlite3
+    Author     : Nikolay A. Burkov <nbrk@linklevel.net>
+    System     : GNU Modula-2
+    Date       : Sun Mar 17 20:08:50 2024
+    Revision   : $Version$
+    Description: Direct bindings to libsqlite3
+*)
 
 FROM SYSTEM IMPORT ADDRESS;
 
@@ -12,7 +18,7 @@ EXPORT UNQUALIFIED   sqlite3, sqlite3_stmt, sqlite3_open, sqlite3_close,
                      sqlite3_column_text, sqlite3_column_bytes,
                      sqlite3_column_type, sqlite3_bind_double,
                      sqlite3_bind_int, sqlite3_bind_null, sqlite3_bind_text,
-                     sqlite3_exec,
+                     sqlite3_exec, sqlite3_bind_parameter_index,
                      SQLITE_OK, SQLITE_ERROR, SQLITE_INTERNAL, SQLITE_PERM,
                      SQLITE_ABORT, SQLITE_BUSY, SQLITE_LOCKED, SQLITE_NOMEM,
                      SQLITE_READONLY, SQLITE_INTERRUPT, SQLITE_IOERR,
@@ -21,7 +27,8 @@ EXPORT UNQUALIFIED   sqlite3, sqlite3_stmt, sqlite3_open, sqlite3_close,
                      SQLITE_SCHEMA, SQLITE_TOOBIG, SQLITE_CONSTRAINT,
                      SQLITE_MISMATCH, SQLITE_MISUSE, SQLITE_NOLFS, SQLITE_AUTH,
                      SQLITE_FORMAT, SQLITE_RANGE, SQLITE_NOTADB, SQLITE_NOTICE,
-                     SQLITE_WARNING, SQLITE_ROW, SQLITE_DONE;
+                     SQLITE_WARNING, SQLITE_ROW, SQLITE_DONE, SQLITE_INTEGER,
+                     SQLITE_FLOAT, SQLITE_TEXT, SQLITE_BLOB, SQLITE_NULL;
 
 CONST
    SQLITE_OK         =  0 ;  (* Successful result *)
@@ -56,52 +63,61 @@ CONST
    SQLITE_ROW        = 100;  (* sqlite3_step() has another row ready *)
    SQLITE_DONE       = 101;  (* sqlite3_step() has finished executing *)
 
+   SQLITE_INTEGER    = 1;    (* 64-bit signed integer *)
+   SQLITE_FLOAT      = 2;    (* 64-bit IEEE floating point number *)
+   SQLITE_TEXT       = 3;    (* string *)
+   SQLITE_BLOB       = 4;    (* BLOB *)
+   SQLITE_NULL       = 5;    (* NULL *)
+
 TYPE
    sqlite3;
    sqlite3_stmt;
 
 
-PROCEDURE sqlite3_open           (filename : ARRAY OF CHAR;
-                                  VAR db   : sqlite3)               : [INTEGER];
-PROCEDURE sqlite3_close          (VAR db : sqlite3)                 : [INTEGER];
-PROCEDURE sqlite3_prepare_v2     (    db    : sqlite3;
-                                      sql   : ARRAY OF CHAR;
-                                      nbyte : INTEGER;
-                                  VAR stmt  : sqlite3_stmt;
-                                  VAR tail  : ADDRESS)              : [INTEGER];
-PROCEDURE sqlite3_reset          (stmt : sqlite3_stmt)              : [INTEGER];
-PROCEDURE sqlite3_finalize       (stmt : sqlite3_stmt)              : [INTEGER];
-PROCEDURE sqlite3_step           (stmt : sqlite3_stmt)              : [INTEGER];
-PROCEDURE sqlite3_column_count   (stmt : sqlite3_stmt)                : INTEGER;
-PROCEDURE sqlite3_column_blob    (stmt : sqlite3_stmt;
-                                  icol : INTEGER)                     : ADDRESS;
-PROCEDURE sqlite3_column_double  (stmt : sqlite3_stmt;
-                                  icol : INTEGER)                     : ADDRESS;
-PROCEDURE sqlite3_column_int     (stmt : sqlite3_stmt;
-                                  icol : INTEGER)                     : ADDRESS;
-PROCEDURE sqlite3_column_text    (stmt : sqlite3_stmt;
-                                  icol : INTEGER)                     : ADDRESS;
-PROCEDURE sqlite3_column_bytes   (stmt : sqlite3_stmt;
-                                  icol : INTEGER)                     : INTEGER;
-PROCEDURE sqlite3_column_type    (stmt : sqlite3_stmt;
-                                  icol : INTEGER)                     : INTEGER;
-PROCEDURE sqlite3_bind_double    (stmt  : sqlite3_stmt;
-                                  i     : INTEGER;
-                                  value : REAL)                     : [INTEGER];
-PROCEDURE sqlite3_bind_int       (stmt  : sqlite3_stmt;
-                                  i,
-                                  value : INTEGER)                  : [INTEGER];
-PROCEDURE sqlite3_bind_null      (stmt : sqlite3_stmt;
-                                  i    : INTEGER)                   : [INTEGER];
-PROCEDURE sqlite3_bind_text      (stmt  : sqlite3_stmt;
-                                  i     : INTEGER;
-                                  value : ARRAY OF CHAR;
-                                  size  : INTEGER;
-                                  dtor  : ADDRESS)                  : [INTEGER];
-PROCEDURE sqlite3_exec           (db      : sqlite3;
-                                  sql     : ARRAY OF CHAR;
-                                  callback,
-                                  cbarg   ,
-                                  errmsg  : ADDRESS)                : [INTEGER];
+PROCEDURE sqlite3_open                 (filename : ARRAY OF CHAR;
+                                        VAR db   : sqlite3)         : [INTEGER];
+PROCEDURE sqlite3_close                (VAR db : sqlite3)           : [INTEGER];
+PROCEDURE sqlite3_prepare_v2           (    db    : sqlite3;
+                                            sql   : ARRAY OF CHAR;
+                                            nbyte : INTEGER;
+                                        VAR stmt  : sqlite3_stmt;
+                                        VAR tail  : ADDRESS)        : [INTEGER];
+PROCEDURE sqlite3_reset                (stmt : sqlite3_stmt)        : [INTEGER];
+PROCEDURE sqlite3_finalize             (stmt : sqlite3_stmt)        : [INTEGER];
+PROCEDURE sqlite3_step                 (stmt : sqlite3_stmt)        : [INTEGER];
+PROCEDURE sqlite3_column_count         (stmt : sqlite3_stmt)          : INTEGER;
+PROCEDURE sqlite3_column_blob          (stmt : sqlite3_stmt;
+                                        icol : INTEGER)               : ADDRESS;
+PROCEDURE sqlite3_column_double        (stmt : sqlite3_stmt;
+                                        icol : INTEGER)               : ADDRESS;
+PROCEDURE sqlite3_column_int           (stmt : sqlite3_stmt;
+                                        icol : INTEGER)               : ADDRESS;
+PROCEDURE sqlite3_column_text          (stmt : sqlite3_stmt;
+                                        icol : INTEGER)               : ADDRESS;
+PROCEDURE sqlite3_column_bytes         (stmt : sqlite3_stmt;
+                                        icol : INTEGER)               : INTEGER;
+PROCEDURE sqlite3_column_type          (stmt : sqlite3_stmt;
+                                        icol : INTEGER)               : INTEGER;
+PROCEDURE sqlite3_bind_double          (stmt  : sqlite3_stmt;
+                                        i     : INTEGER;
+                                        value : REAL)               : [INTEGER];
+PROCEDURE sqlite3_bind_int             (stmt  : sqlite3_stmt;
+                                        i,
+                                        value : INTEGER)            : [INTEGER];
+PROCEDURE sqlite3_bind_null            (stmt : sqlite3_stmt;
+                                        i    : INTEGER)             : [INTEGER];
+PROCEDURE sqlite3_bind_text            (stmt  : sqlite3_stmt;
+                                        i     : INTEGER;
+                                        value : ARRAY OF CHAR;
+                                        size  : INTEGER;
+                                        dtor  : ADDRESS)            : [INTEGER];
+PROCEDURE sqlite3_exec                 (db      : sqlite3;
+                                        sql     : ARRAY OF CHAR;
+                                        callback,
+                                        cbarg   ,
+                                        errmsg  : ADDRESS)          : [INTEGER];
+PROCEDURE sqlite3_bind_parameter_index (db : sqlite3;
+                                        name : ARRAY OF CHAR) :         INTEGER;
+
 
 END libsqlite3.

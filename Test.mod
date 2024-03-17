@@ -66,6 +66,8 @@ BEGIN
    WriteString ("sqlite3_bind_int (index 2) results: "); WriteInt (ret, 4); WriteLn;
    ret := libsqlite3.sqlite3_step(stmt);
    WriteString ("sqlite3_step results: "); WriteInt (ret, 4); WriteLn;
+   WriteString ("Column type: ");
+   WriteInt (libsqlite3.sqlite3_column_type(stmt, 0), 4); WriteLn;
    (* step loop *)
    WHILE ret = libsqlite3.SQLITE_ROW DO
       str := InitStringCharStar( libsqlite3.sqlite3_column_text(stmt, 0));
